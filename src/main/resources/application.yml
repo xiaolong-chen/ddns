@@ -1,0 +1,19 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: ali DDNS service
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+
+ddns:
+  # 阿里云dns服务地址
+  endpoint: 127.0.0.1
+  # 阿里云accessKeyId
+  accessKeyId: 1234567890
+  # 阿里云accessKeySecret
+  accessKeySecret: 1234567890
+  # 域名
+  domainName: example.com
