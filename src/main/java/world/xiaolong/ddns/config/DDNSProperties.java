@@ -25,5 +25,9 @@ public class DDNSProperties {
      * 域名
      */
     private String domainName;
+    /**
+     * 自动更新内存域名记录时间间隔（毫秒）
+     */
+    private long AutoUpdateIntervalTime;
 
 }

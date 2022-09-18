@@ -10,10 +10,9 @@ import world.xiaolong.ddns.config.DDNSProperties;
 import world.xiaolong.ddns.enums.CodeEnum;
 import world.xiaolong.ddns.enums.OperateEnum;
 import world.xiaolong.ddns.enums.ResultEnum;
+import world.xiaolong.ddns.util.MemoryData;
 import world.xiaolong.ddns.vo.DDNSRequestVO;
 import world.xiaolong.ddns.vo.ResultVO;
-
-import java.util.List;
 
 @Service
 @Slf4j
@@ -26,30 +25,55 @@ public class DDNSService {
     private Client client;
     private ObjectMapper objectMapper;
 
-    public ResultVO<List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord>> info() throws Exception {
-        log.info("查询所有DNS记录");
+    public void updateDDNS() throws Exception {
+        log.info("更新内存DNS记录");
         DescribeDomainRecordsRequest request = new DescribeDomainRecordsRequest();
         request.setDomainName(ddnsProperties.getDomainName()).setPageSize(100L);
         DescribeDomainRecordsResponse response = client.describeDomainRecords(request);
+        MemoryData.setList(response.body.domainRecords.record);
         log.info("查询结果: {}", objectMapper.writeValueAsString(response));
-
-        return ResultVO.buildResult(ResultEnum.SUCCESS, CodeEnum.SUCCESS, response.body.domainRecords.record);
     }
 
     public ResultVO configDDns(OperateEnum operate, DDNSRequestVO request) throws Exception {
         request.setRr(request.getRr().toLowerCase());
         log.info("{}dns: rr[{}]type[{}]value[{}]", operate.getInfo(), request.getRr(), request.getType(), request.getValue());
-        ResultVO<List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord>> info = info();
-        DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord record = info.getData().stream().filter(r -> r.getRR().equals(request.getRr()) && r.getType().equals(request.getType())).findFirst().orElse(null);
+        ResultVO result;
+        DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord record = MemoryData.getList()
+                .stream().filter(r -> r.getRR().equals(request.getRr()) && r.getType().equals(request.getType())).findFirst().orElse(null);
+
         if (operate == OperateEnum.ADD) {
-            return record == null ? addDns(request) : ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.FOUND, "该记录已存在", record);
-        } else if (operate == OperateEnum.UPDATE) {
-            return record != null && !record.value.equals(request.getValue()) ? updateDns(request, record.getRecordId()) : ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.FOUND, "该值已存在", record);
-        } else if (operate == OperateEnum.DELETE) {
-            return record != null ? deleteDns(record.recordId) : ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.NOT_FOUND, "不存在该记录", null);
-        } else {
-            return ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.NOT_IMPL, null);
+            if (record == null) {
+                result = addDns(request);
+                updateDDNS();
+            } else {
+                result = ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.FOUND, "该记录已存在", record);
+            }
+            return result;
         }
+
+        if (operate == OperateEnum.UPDATE) {
+            if (record == null) {
+                result = ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.NOT_FOUND, "不存在该记录", null);
+            } else if (record.value.equals(request.getValue())) {
+                result = ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.FOUND, "该值已存在", record);
+            } else {
+                result = updateDns(request, record.getRecordId());
+                updateDDNS();
+            }
+            return result;
+        }
+
+        if (operate == OperateEnum.DELETE) {
+            if (record == null) {
+                result = ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.NOT_FOUND, "不存在该记录", null);
+            } else {
+                result = deleteDns(record.recordId);
+                updateDDNS();
+            }
+            return result;
+        }
+
+        return ResultVO.buildResult(ResultEnum.FAIL, CodeEnum.NOT_IMPL, null);
     }
 
     public ResultVO addDns(DDNSRequestVO requestVO) throws Exception {

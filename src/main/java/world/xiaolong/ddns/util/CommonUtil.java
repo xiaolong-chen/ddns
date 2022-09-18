@@ -23,7 +23,19 @@ public class CommonUtil {
      * </ul>
      */
     public static void confTraceID() {
-        confTraceID(null);
+        confTraceID(null, null);
+    }
+
+    /**
+     * <b>方法说明：</b>
+     * <ul>
+     * 配置日志编号
+     * </ul>
+     *
+     * @param ip
+     */
+    public static void confTraceID(String ip) {
+        confTraceID(null, ip);
     }
 
     /**
@@ -33,13 +45,18 @@ public class CommonUtil {
      * </ul>
      *
      * @param traceID
+     * @param ip
      */
-    public static void confTraceID(String traceID) {
+    public static void confTraceID(String traceID, String ip) {
         if (StrUtil.isEmpty(traceID)) {
             traceID = StrUtil.toString(System.currentTimeMillis());
         }
+        if (StrUtil.isEmpty(ip)) {
+            ip = "localhost";
+        }
         MDC.clear();
         MDC.put("traceID", traceID);
+        MDC.put("ip", ip);
     }
 
     /**
@@ -54,7 +71,7 @@ public class CommonUtil {
     public static String getCurrentTraceID() {
         String traceID = MDC.get("traceID");
         if (StrUtil.isEmpty(traceID)) {
-            confTraceID();
+            confTraceID(traceID, MDC.get("ip"));
             traceID = MDC.get("traceID");
         }
         return traceID;

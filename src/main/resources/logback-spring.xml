@@ -10,9 +10,9 @@
     <property name="log.maxHistory" value="10"/>
     <property name="log.totalSizeCap" value="50MB"/>
     <property name="log.colorPattern"
-              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(%-40.40logger{39}){cyan} %clr([%20.-20t \\(%-4.4line\\)]){faint} %clr([%12.12X{traceID}]){magenta} %clr(:){faint} %m%n%wEx"/>
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(%-40.40logger{39}){cyan} %clr([%20.-20t \\(%-4.4line\\)]){faint} %clr([%12.12X{traceID}][%15.15X{ip}]){magenta} %clr(:){faint} %m%n%wEx"/>
     <property name="log.pattern"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p %-40.40logger{39} [%20.-20t \\(%-4.4line\\)] [%12.12X{traceID}] : %m%n%wEx"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p %-40.40logger{39} [%20.-20t \\(%-4.4line\\)] [%12.12X{traceID}][%15.15X{ip}] : %m%n%wEx"/>
 
     <!--输出到控制台 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">

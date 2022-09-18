@@ -1,12 +1,12 @@
 package world.xiaolong.ddns;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import world.xiaolong.ddns.util.CommonUtil;
 
 @SpringBootApplication
-@Slf4j
+@EnableScheduling
 public class DDNSAPP {
 
     public static void main(String[] args) throws Exception {

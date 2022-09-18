@@ -1,8 +1,10 @@
 package world.xiaolong.ddns.vo;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class DDNSRequestVO {
 
     /**
@@ -11,7 +13,7 @@ public class DDNSRequestVO {
     private String rr;
     /**
      * 类型<br>
-     * AA:ipv4<br>
+     * A:ipv4<br>
      * AAAA:ipv6<>
      */
     private String type;

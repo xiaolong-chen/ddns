@@ -17,3 +17,5 @@ ddns:
   accessKeySecret: 1234567890
   # 域名
   domainName: example.com
+  # 自动更新内存域名记录时间间隔（毫秒）
+  AutoUpdateIntervalTime: 3600000
